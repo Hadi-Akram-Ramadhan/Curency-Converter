@@ -1,69 +1,89 @@
 <template>
-  <div class="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
+  <div class="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 py-6 flex flex-col justify-center sm:py-12">
     <div class="relative py-3 sm:max-w-xl sm:mx-auto">
-      <div class="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
+      <div class="relative px-4 py-10 bg-white/80 backdrop-blur-lg shadow-xl rounded-3xl sm:p-16">
         <div class="max-w-md mx-auto">
-          <div class="divide-y divide-gray-200">
-            <div class="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
-              <h1 class="text-3xl font-bold text-center mb-8">Currency Converter</h1>
+          <div class="flex items-center justify-center mb-8">
+            <svg class="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h1 class="text-3xl font-bold text-gray-800 ml-3">Currency Converter</h1>
+          </div>
 
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700">Amount</label>
-                  <input
-                    v-model="amount"
-                    type="number"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  >
-                </div>
+          <div class="space-y-6">
+            <!-- Amount Input -->
+            <div class="relative">
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Amount</label>
+              <input
+                v-model="amount"
+                type="number"
+                min="0"
+                step="0.01"
+                class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition duration-200 bg-white/50 backdrop-blur-sm"
+                placeholder="Enter amount..."
+              >
+            </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700">From</label>
-                    <select
-                      v-model="fromCurrency"
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                    >
-                      <option v-for="currency in currencies" :key="currency" :value="currency">
-                        {{ currency }}
-                      </option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700">To</label>
-                    <select
-                      v-model="toCurrency"
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                    >
-                      <option v-for="currency in currencies" :key="currency" :value="currency">
-                        {{ currency }}
-                      </option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="mt-4">
-                  <button
-                    @click="convertCurrency"
-                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  >
-                    Convert
-                  </button>
-                </div>
-
-                <div v-if="result" class="mt-4 p-4 bg-gray-50 rounded-md">
-                  <p class="text-lg font-medium text-gray-900">
-                    {{ amount }} {{ fromCurrency }} = {{ result }} {{ toCurrency }}
-                  </p>
-                </div>
-
-                <div v-if="error" class="mt-4 p-4 bg-red-50 rounded-md">
-                  <p class="text-lg font-medium text-red-900">
-                    {{ error }}
-                  </p>
-                </div>
+            <!-- Currency Selectors -->
+            <div class="grid grid-cols-[1fr,auto,1fr] gap-4 items-center">
+              <div>
+                <label class="text-sm font-medium text-gray-700 mb-1 block">From</label>
+                <select
+                  v-model="fromCurrency"
+                  class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition duration-200 bg-white/50 backdrop-blur-sm"
+                >
+                  <option v-for="currency in currencies" :key="currency" :value="currency">
+                    {{ currency }}
+                  </option>
+                </select>
               </div>
+
+              <!-- Swap Button -->
+              <button
+                @click="swapCurrencies"
+                class="mt-6 p-2 rounded-full hover:bg-gray-100 transition duration-200"
+              >
+                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+              </button>
+
+              <div>
+                <label class="text-sm font-medium text-gray-700 mb-1 block">To</label>
+                <select
+                  v-model="toCurrency"
+                  class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition duration-200 bg-white/50 backdrop-blur-sm"
+                >
+                  <option v-for="currency in currencies" :key="currency" :value="currency">
+                    {{ currency }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Convert Button -->
+            <button
+              @click="convertCurrency"
+              class="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-medium hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transform transition duration-200 hover:scale-[1.02]"
+            >
+              Convert
+            </button>
+
+            <!-- Result -->
+            <div v-if="result" class="mt-6 p-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50">
+              <p class="text-xl font-semibold text-gray-800 text-center">
+                {{ amount }} {{ fromCurrency }} = {{ result }} {{ toCurrency }}
+              </p>
+              <p class="text-sm text-gray-500 text-center mt-1">
+                1 {{ fromCurrency }} = {{ (result / amount).toFixed(4) }} {{ toCurrency }}
+              </p>
+            </div>
+
+            <!-- Error Message -->
+            <div v-if="error" class="mt-6 p-4 rounded-lg bg-red-50 border border-red-100">
+              <p class="text-sm font-medium text-red-800 text-center">
+                {{ error }}
+              </p>
             </div>
           </div>
         </div>
@@ -94,6 +114,11 @@ const fetchCurrencies = async () => {
 }
 
 const convertCurrency = async () => {
+  if (fromCurrency.value === toCurrency.value) {
+    result.value = amount.value
+    return
+  }
+
   try {
     error.value = null
     const response = await axios.get(
@@ -104,6 +129,11 @@ const convertCurrency = async () => {
     console.error('Error converting currency:', error)
     error.value = 'Failed to convert currency. Please try again later.'
   }
+}
+
+const swapCurrencies = () => {
+  [fromCurrency.value, toCurrency.value] = [toCurrency.value, fromCurrency.value]
+  if (result.value) convertCurrency()
 }
 
 onMounted(() => {
